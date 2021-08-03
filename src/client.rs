@@ -1,34 +1,49 @@
-#[derive(Debug, serde::Deserialize)]
+use reqwest::Client;
+
 pub struct WeChatClient {
-    pub appid: String,
-    pub secret: String,
+    /// Wechat mini-program appid.
+    appid: String,
+    /// Wechat mini-program secret key.
+    secret: String,
+
+    /// Reqwest HTTP client
+    client: Client,
 }
 
-#[derive(Debug, serde::Deserialize)]
 pub struct WeChatClientBuilder {
-    pub appid: String,
-    pub secret: String,
+    /// Wechat mini-program appid.
+    appid: Option<String>,
+    /// Wechat mini-program secret key.
+    secret: Option<String>,
 }
 
 impl WeChatClientBuilder {
     pub fn new() -> Self {
         WeChatClientBuilder {
-            appid: String::from(""),
-            secret: String::from(""),
+            appid: None,
+            secret: None,
         }
     }
-    pub fn appid(mut self, appid: String) -> WeChatClientBuilder {
-        self.appid = appid;
+
+    pub fn appid(mut self, appid: String) -> Self {
+        self.appid = Some(appid);
         self
     }
-    pub fn secret(mut self, secret: &str) -> WeChatClientBuilder {
-        self.secret = String::from(secret);
+
+    pub fn secret(mut self, secret: &str) -> Self {
+        self.secret = Some(secret.to_string());
         self
     }
+
     pub fn build(self: Self) -> WeChatClient {
         WeChatClient {
-            appid: self.appid,
-            secret: self.secret,
+            appid: self.appid.unwrap_or_else(|| {
+                panic!("Appid is required in WeChatClientBuilder, please call appid method.")
+            }),
+            secret: self.secret.unwrap_or_else(|| {
+                panic!("Secret is required in WeChatClientBuilder, please call secret method.")
+            }),
+            client: Client::new(),
         }
     }
 }
