@@ -1,1 +1,7 @@
 /target
+
+# Clion project directory
+.idea/
+
+# VS Code project
+.vscode/
