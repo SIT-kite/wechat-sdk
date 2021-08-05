@@ -5,7 +5,7 @@ use serde_json::Error as JsonError;
 #[derive(Debug, Serialize, thiserror::Error)]
 #[error("Wechat interface error {}: {:?}.", code, msg)]
 pub struct WxApiError {
-    pub code: u16,
+    pub code: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub msg: Option<String>,
 }
@@ -32,7 +32,7 @@ convert_inner_errors!(JsonError);
 convert_inner_errors!(String);
 
 impl WxApiError {
-    pub fn new(code: u16, msg: String) -> Self {
+    pub fn new(code: i32, msg: String) -> Self {
         WxApiError { code, msg: Some(msg) }
     }
 }

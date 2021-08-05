@@ -10,7 +10,7 @@ use super::*;
 struct AccessTokenResponse {
     access_token: Option<String>,
     expires_in: Option<i32>,
-    errcode: Option<u16>,
+    errcode: Option<i32>,
     errmsg: Option<String>,
 }
 
@@ -35,9 +35,9 @@ impl GetAccessToken for WeChatClient {
                 "secret" => &self.secret,
                 "grant_type" => "client_credential"
             )
-                .as_str(),
+            .as_str(),
         )
-            .await?;
+        .await?;
 
         match resp {
             AccessTokenResponse {

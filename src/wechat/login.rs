@@ -9,7 +9,7 @@ use super::*;
 #[derive(Debug, serde::Deserialize)]
 struct SessionResponse {
     // When error occurred
-    pub errcode: Option<u16>,
+    pub errcode: Option<i32>,
     pub errmsg: Option<String>,
     // Successful.
     pub session_key: Option<String>,
@@ -40,9 +40,9 @@ impl Login for WeChatClient {
                 "js_code" => wechat_code,
                 "grant_type" => "authorization_code"
             )
-                .as_str(),
+            .as_str(),
         )
-            .await?;
+        .await?;
 
         // TODO:
         // 每个函数中的这段 match 代码可以放到 wx_function 宏里面去提前处理错误
@@ -52,7 +52,7 @@ impl Login for WeChatClient {
                 session_key: Some(session_key),
                 openid: Some(openid),
                 ..
-            } => return Ok(WxSession { session_key, openid }),
+            } => Ok(WxSession { session_key, openid }),
             SessionResponse {
                 errcode: Some(errcode),
                 errmsg: Some(errmsg),
