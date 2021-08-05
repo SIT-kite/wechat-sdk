@@ -2,6 +2,9 @@ use reqwest::Client;
 
 use crate::error::WxClientError;
 
+pub use login::Login;
+pub use token::GetAccessToken;
+
 mod login;
 mod token;
 

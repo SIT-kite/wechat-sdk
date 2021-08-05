@@ -1,5 +1,6 @@
 pub use client::WeChatClientBuilder;
+pub use error::WxClientError;
 
-mod client;
-mod error;
-mod wechat;
+pub mod client;
+pub mod error;
+pub mod wechat;

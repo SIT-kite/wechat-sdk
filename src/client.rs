@@ -23,12 +23,12 @@ impl WeChatClientBuilder {
         WeChatClientBuilder::default()
     }
 
-    pub fn appid(mut self, appid: String) -> Self {
-        self.appid = Some(appid);
+    pub fn appid<T: ToString>(mut self, appid: T) -> Self {
+        self.appid = Some(appid.to_string());
         self
     }
 
-    pub fn secret(mut self, secret: &str) -> Self {
+    pub fn secret<T: ToString>(mut self, secret: T) -> Self {
         self.secret = Some(secret.to_string());
         self
     }
