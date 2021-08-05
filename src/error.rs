@@ -6,19 +6,33 @@ pub type Result<T> = std::result::Result<T, WxApiError>;
 pub type Error = WxApiError;
 
 #[derive(Debug, Serialize, thiserror::Error)]
-#[error("Wechat interface error {}: {}.", errcode, errmsg)]
+#[error("Wechat interface error {}: {:?}.", code, msg)]
 pub struct WxApiError {
     pub code: u16,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub msg: Option<String>,
 }
 
-// TODO: Add conversion from ReqError, JsonError, ... to WxClientError.
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub enum WxClientError {
     Api(WxApiError),
     Inner(Box<dyn std::error::Error>),
 }
+
+#[macro_export]
+macro_rules! convert_inner_errors {
+    ($src_err_type: ident) => {
+        impl From<$src_err_type> for WxClientError {
+            fn from(sub_err: $src_err_type) -> Self{
+                return Self::Inner(Box::from(sub_err));
+            }
+        }
+    };
+}
+
+convert_inner_errors!(ReqError);
+convert_inner_errors!(JsonError);
+convert_inner_errors!(String);
 
 impl WxApiError {
     pub fn new(code: u16, msg: String) -> Self {

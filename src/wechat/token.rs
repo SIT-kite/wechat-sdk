@@ -16,7 +16,7 @@ struct AccessTokenResponse {
 
 #[async_trait]
 pub trait GetAccessToken {
-    async fn get_access_token(&self) -> Result<WxAccessToken, WxApiError>;
+    async fn get_access_token(&self) -> Result<WxAccessToken, WxClientError>;
 }
 
 crate::wx_function!(
@@ -27,7 +27,7 @@ crate::wx_function!(
 
 #[async_trait]
 impl GetAccessToken for WeChatClient {
-    async fn get_access_token(&self) -> Result<WxAccessToken, WxApiError> {
+    async fn get_access_token(&self) -> Result<WxAccessToken, WxClientError> {
         let resp: AccessTokenResponse = _get_access_token(
             make_parameter!(
                 "appid" => &self.appid,
@@ -51,8 +51,8 @@ impl GetAccessToken for WeChatClient {
                 errcode: Some(errcode),
                 errmsg: Some(errmsg),
                 ..
-            } => Err(WxApiError::new(errcode, errmsg)),
-            _ => Err(WxApiError::new(0, "Unknown".to_string())),
+            } => Err(WxClientError::Api(WxApiError::new(errcode, errmsg))),
+            _ => Err(WxClientError::Api(WxApiError::new(0, "Unknown".to_string()))),
         }
     }
 }

@@ -2,9 +2,9 @@ use reqwest::Client;
 
 pub struct WeChatClient {
     /// Wechat mini-program appid.
-    appid: String,
+    pub appid: String,
     /// Wechat mini-program secret key.
-    secret: String,
+    pub secret: String,
 
     /// Reqwest HTTP client
     client: Client,

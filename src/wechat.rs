@@ -1,6 +1,10 @@
 mod login;
 mod token;
 
+use crate::error::WxClientError;
+use reqwest::Client;
+
+
 pub struct WxSession {
     pub session_key: String,
     pub openid: String,
@@ -37,14 +41,14 @@ macro_rules! wx_function {
 
             match response {
                 // Note: Sending successfully, not receiving.
-                Ok(mut r) => {
+                Ok(r) => {
                     // Wechat services always return HTTP 200, with errcode field when parameter error.
                     // Decode json string or give an empty json.
                     let body_string = r.text().await?;
                     let body_json: $structure = serde_json::from_slice(body_string.as_ref())?;
                     return Ok(body_json);
                 }
-                Err(e) => Err(ApiError::from(format!(
+                Err(e) => Err(WxClientError::from(format!(
                     "While connecting to wechat services: {}",
                     e
                 ))),

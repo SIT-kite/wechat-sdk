@@ -20,7 +20,7 @@ struct SessionResponse {
 
 #[async_trait]
 pub trait Login {
-    async fn code2session(&self, wechat_code: &str) -> Result<WxSession, WxApiError>;
+    async fn code2session(&self, wechat_code: &str) -> Result<WxSession, WxClientError>;
 }
 
 crate::wx_function!(
@@ -31,7 +31,7 @@ crate::wx_function!(
 
 #[async_trait]
 impl Login for WeChatClient {
-    async fn code2session(&self, wechat_code: &str) -> Result<WxSession, WxApiError> {
+    async fn code2session(&self, wechat_code: &str) -> Result<WxSession, WxClientError> {
         let resp: SessionResponse = _get_session_key(
             make_parameter!(
                 "appid" => &self.appid,
@@ -61,8 +61,8 @@ impl Login for WeChatClient {
                 errcode: Some(errcode),
                 errmsg: Some(errmsg),
                 ..
-            } => Err(WxApiError::new(errcode, errmsg)),
-            _ => Err(WxApiError::new(0, "Unknown".to_string())),
+            } => Err(WxClientError::Api(WxApiError::new(errcode, errmsg))),
+            _ => Err(WxClientError::Api(WxApiError::new(0, "Unknown".to_string()))),
         }
     }
 }
