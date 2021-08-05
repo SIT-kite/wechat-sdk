@@ -32,9 +32,7 @@ macro_rules! make_parameter {
 #[macro_export]
 macro_rules! wx_function {
     ($fn_name: ident, $structure: ident, $addr: expr) => {
-        async fn $fn_name(param: &str) -> Result<$structure, WxClientError> {
-            // create actix-web client for request.
-            let client = Client::new();
+        async fn $fn_name(client: &Client, param: &str) -> Result<$structure, WxClientError> {
             let url = format!("{}?{}", $addr, param);
             // return Err(ApiError::from(url));
             let response = client.get(url).send().await;

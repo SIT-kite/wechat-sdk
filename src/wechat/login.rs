@@ -33,6 +33,7 @@ crate::wx_function!(
 impl Login for WeChatClient {
     async fn code2session(&self, wechat_code: &str) -> Result<WxSession, WxClientError> {
         let resp: SessionResponse = _get_session_key(
+            &self.client,
             make_parameter!(
                 "appid" => &self.appid,
                 "secret" => &self.secret,

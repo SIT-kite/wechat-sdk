@@ -29,6 +29,7 @@ crate::wx_function!(
 impl GetAccessToken for WeChatClient {
     async fn get_access_token(&self) -> Result<WxAccessToken, WxClientError> {
         let resp: AccessTokenResponse = _get_access_token(
+            &self.client,
             make_parameter!(
                 "appid" => &self.appid,
                 "secret" => &self.secret,
