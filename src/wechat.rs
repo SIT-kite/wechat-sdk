@@ -37,7 +37,6 @@ macro_rules! wx_function {
     ($fn_name: ident, $structure: ident, $addr: expr) => {
         async fn $fn_name(client: &Client, param: &str) -> Result<$structure, WxClientError> {
             let url = format!("{}?{}", $addr, param);
-            // return Err(ApiError::from(url));
             let response = client.get(url).send().await;
 
             match response {
@@ -47,12 +46,9 @@ macro_rules! wx_function {
                     // Decode json string or give an empty json.
                     let body_string = r.text().await?;
                     let body_json: $structure = serde_json::from_slice(body_string.as_ref())?;
-                    return Ok(body_json);
+                    Ok(body_json)
                 }
-                Err(e) => Err(WxClientError::from(format!(
-                    "While connecting to wechat services: {}",
-                    e
-                ))),
+                Err(e) => Err(WxClientError::Inner(Box::from(e))),
             }
         } // End of function.
     }; // End of pattern.
