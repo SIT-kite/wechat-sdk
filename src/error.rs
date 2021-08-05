@@ -2,9 +2,6 @@ use reqwest::Error as ReqError;
 use serde::Serialize;
 use serde_json::Error as JsonError;
 
-pub type Result<T> = std::result::Result<T, WxApiError>;
-pub type Error = WxApiError;
-
 #[derive(Debug, Serialize, thiserror::Error)]
 #[error("Wechat interface error {}: {:?}.", code, msg)]
 pub struct WxApiError {
@@ -23,7 +20,7 @@ pub enum WxClientError {
 macro_rules! convert_inner_errors {
     ($src_err_type: ident) => {
         impl From<$src_err_type> for WxClientError {
-            fn from(sub_err: $src_err_type) -> Self{
+            fn from(sub_err: $src_err_type) -> Self {
                 return Self::Inner(Box::from(sub_err));
             }
         }
@@ -36,9 +33,6 @@ convert_inner_errors!(String);
 
 impl WxApiError {
     pub fn new(code: u16, msg: String) -> Self {
-        WxApiError {
-            code,
-            msg: Some(msg),
-        }
+        WxApiError { code, msg: Some(msg) }
     }
 }

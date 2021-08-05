@@ -51,12 +51,7 @@ impl Login for WeChatClient {
                 session_key: Some(session_key),
                 openid: Some(openid),
                 ..
-            } => {
-                return Ok(WxSession {
-                    session_key,
-                    openid,
-                })
-            }
+            } => return Ok(WxSession { session_key, openid }),
             SessionResponse {
                 errcode: Some(errcode),
                 errmsg: Some(errmsg),

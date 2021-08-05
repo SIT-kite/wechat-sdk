@@ -2,14 +2,15 @@ use reqwest::Client;
 
 pub struct WeChatClient {
     /// Wechat mini-program appid.
-    pub appid: String,
+    pub(crate) appid: String,
     /// Wechat mini-program secret key.
-    pub secret: String,
+    pub(crate) secret: String,
 
     /// Reqwest HTTP client
-    client: Client,
+    pub(crate) client: Client,
 }
 
+#[derive(Default)]
 pub struct WeChatClientBuilder {
     /// Wechat mini-program appid.
     appid: Option<String>,
@@ -19,10 +20,7 @@ pub struct WeChatClientBuilder {
 
 impl WeChatClientBuilder {
     pub fn new() -> Self {
-        WeChatClientBuilder {
-            appid: None,
-            secret: None,
-        }
+        WeChatClientBuilder::default()
     }
 
     pub fn appid(mut self, appid: String) -> Self {
@@ -35,7 +33,7 @@ impl WeChatClientBuilder {
         self
     }
 
-    pub fn build(self: Self) -> WeChatClient {
+    pub fn build(self) -> WeChatClient {
         WeChatClient {
             appid: self.appid.unwrap_or_else(|| {
                 panic!("Appid is required in WeChatClientBuilder, please call appid method.")

@@ -1,9 +1,9 @@
-mod login;
-mod token;
-
-use crate::error::WxClientError;
 use reqwest::Client;
 
+use crate::error::WxClientError;
+
+mod login;
+mod token;
 
 pub struct WxSession {
     pub session_key: String,
