@@ -1,7 +1,6 @@
 use wechat_sdk::wechat::GetAccessToken;
 use wechat_sdk::WxClientError;
 
-
 #[tokio::main]
 async fn main() {
     let mut client = wechat_sdk::WeChatClientBuilder::new()
@@ -12,7 +11,7 @@ async fn main() {
     let result = client.get_access_token().await;
     match result {
         Ok(token) => println!("Get token successfully, token = {}", token.access_token),
-        Err(e) => match e{
+        Err(e) => match e {
             WxClientError::Api(api_err) => println!(
                 "Failed to get token, error code is {}, and reason is {:?}",
                 api_err.code, api_err.msg

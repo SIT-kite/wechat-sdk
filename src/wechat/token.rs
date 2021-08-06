@@ -17,7 +17,8 @@ struct AccessTokenResponse {
 #[async_trait]
 pub trait GetAccessToken {
     async fn get_access_token_anyway(&mut self) -> Result<WxAccessToken, WxClientError>;
-    async fn get_access_token(&mut self) -> Result<WxAccessToken,  WxClientError>;
+    async fn get_access_token(&mut self) -> Result<WxAccessToken, WxClientError>;
+    async fn refresh_access_token(&mut self) -> Result<(), WxClientError>;
 }
 
 crate::wx_function!(
@@ -46,33 +47,43 @@ impl GetAccessToken for WeChatClient {
                 expires_in: Some(expires_in),
                 ..
             } => {
-                self.token.store_token(&access_token, expires_in as i64);
+                let now_millis = Utc::now().timestamp_millis();
+                let expire_ts = now_millis + expires_in as i64 * 1000;
+
                 Ok(WxAccessToken {
-                access_token,
-                expires_in,
-            })},
+                    access_token,
+                    expire_ts,
+                })
+            }
             AccessTokenResponse {
                 errcode: Some(errcode),
                 errmsg: Some(errmsg),
                 ..
             } => Err(WxClientError::Api(WxApiError::new(errcode, errmsg))),
-            _ => Err(WxClientError::Api(WxApiError::new(0, "Unknown".to_string()))),
+            _ => Err(WxClientError::Api(WxApiError::new(
+                0,
+                "Unexpected response from wechat server.".to_string(),
+            ))),
         }
     }
 
     async fn get_access_token(&mut self) -> Result<WxAccessToken, WxClientError> {
-        let now = Utc::now().timestamp_millis();
-        if self.token.time < now  && self.token.time != 0{
-            let token = String::from(&self.token.access_token);
-            let time_spent = (Utc::now().timestamp_millis() - &self.token.time) / 1000;
-            let time_left = 7200 - time_spent as i32;
-            Ok(WxAccessToken{
-                access_token: token,
-                expires_in: time_left ,
+        let token = &self.token;
+
+        if !token.is_expired() {
+            Ok(WxAccessToken {
+                access_token: String::from(&token.access_token),
+                expire_ts: token.expire_ts,
             })
-        }
-        else {
+        } else {
             self.get_access_token_anyway().await
         }
+    }
+
+    async fn refresh_access_token(&mut self) -> Result<(), WxClientError> {
+        let new_token = self.get_access_token_anyway().await?;
+        self.token = new_token;
+
+        Ok(())
     }
 }
