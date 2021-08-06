@@ -1,4 +1,5 @@
 use reqwest::Client;
+use crate::wechat::AccessToken;
 
 pub struct WeChatClient {
     /// Wechat mini-program appid.
@@ -8,6 +9,9 @@ pub struct WeChatClient {
 
     /// Reqwest HTTP client
     pub(crate) client: Client,
+
+    /// Wechat access token
+    pub(crate) token: AccessToken,
 }
 
 #[derive(Default)]
@@ -42,6 +46,7 @@ impl WeChatClientBuilder {
                 panic!("Secret is required in WeChatClientBuilder, please call secret method.")
             }),
             client: Client::new(),
+            token: AccessToken::default(),
         }
     }
 }

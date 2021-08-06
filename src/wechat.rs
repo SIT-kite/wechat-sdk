@@ -1,4 +1,5 @@
 use reqwest::Client;
+use chrono::prelude::*;
 
 use crate::error::WxClientError;
 
@@ -16,6 +17,22 @@ pub struct WxSession {
 pub struct WxAccessToken {
     pub access_token: String,
     pub expires_in: i32,
+}
+
+#[derive(Default)]
+pub struct AccessToken {
+    pub access_token: String,
+    pub time: i64,
+}
+
+impl AccessToken {
+    pub fn store_token<T: ToString>(&mut self, token: &T, expires_in: i64){
+        self.access_token = token.to_string();
+        let now= Utc::now();
+        let now_millis = now.timestamp_millis();
+        let next_update_time = now_millis + expires_in * 1000;
+        self.time = next_update_time;
+    }
 }
 
 #[macro_export]
