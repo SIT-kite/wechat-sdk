@@ -14,7 +14,7 @@ pub struct WxSession {
     pub openid: String,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct WxAccessToken {
     pub access_token: String,
     pub expire_ts: i64,

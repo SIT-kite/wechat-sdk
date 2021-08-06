@@ -1,6 +1,9 @@
 use crate::wechat::WxAccessToken;
 use reqwest::Client;
+use tokio::sync::RwLock;
+use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct WeChatClient {
     /// Wechat mini-program appid.
     pub(crate) appid: String,
@@ -11,7 +14,7 @@ pub struct WeChatClient {
     pub(crate) client: Client,
 
     /// Wechat access token
-    pub(crate) token: WxAccessToken,
+    pub(crate) token: Arc<RwLock<WxAccessToken>>,
 }
 
 #[derive(Default)]
@@ -46,7 +49,7 @@ impl WeChatClientBuilder {
                 panic!("Secret is required in WeChatClientBuilder, please call secret method.")
             }),
             client: Client::new(),
-            token: WxAccessToken::default(),
+            token: Arc::new(RwLock::new(WxAccessToken::default())),
         }
     }
 }

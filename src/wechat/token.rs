@@ -16,9 +16,9 @@ struct AccessTokenResponse {
 
 #[async_trait]
 pub trait GetAccessToken {
-    async fn get_access_token_anyway(&mut self) -> Result<WxAccessToken, WxClientError>;
-    async fn get_access_token(&mut self) -> Result<WxAccessToken, WxClientError>;
-    async fn refresh_access_token(&mut self) -> Result<(), WxClientError>;
+    async fn get_access_token_anyway(&self) -> Result<WxAccessToken, WxClientError>;
+    async fn get_access_token(&self) -> Result<WxAccessToken, WxClientError>;
+    async fn refresh_access_token(&self) -> Result<(), WxClientError>;
 }
 
 crate::wx_function!(
@@ -29,7 +29,7 @@ crate::wx_function!(
 
 #[async_trait]
 impl GetAccessToken for WeChatClient {
-    async fn get_access_token_anyway(&mut self) -> Result<WxAccessToken, WxClientError> {
+    async fn get_access_token_anyway(&self) -> Result<WxAccessToken, WxClientError> {
         let resp: AccessTokenResponse = _get_access_token(
             &self.client,
             make_parameter!(
@@ -67,22 +67,25 @@ impl GetAccessToken for WeChatClient {
         }
     }
 
-    async fn get_access_token(&mut self) -> Result<WxAccessToken, WxClientError> {
-        let token = &self.token;
+    async fn get_access_token(&self) -> Result<WxAccessToken, WxClientError> {
+        let token = self.token.read().await;
 
         if !token.is_expired() {
             Ok(WxAccessToken {
-                access_token: String::from(&token.access_token),
+                access_token: String::from(&*token.access_token),
                 expire_ts: token.expire_ts,
             })
         } else {
-            self.get_access_token_anyway().await
+            self.refresh_access_token().await?;
+            let token = self.token.read().await;
+            Ok(token.clone())
         }
     }
 
-    async fn refresh_access_token(&mut self) -> Result<(), WxClientError> {
+    async fn refresh_access_token(&self) -> Result<(), WxClientError> {
         let new_token = self.get_access_token_anyway().await?;
-        self.token = new_token;
+        let mut old_token = self.token.write().await;
+        *old_token = new_token;
 
         Ok(())
     }
