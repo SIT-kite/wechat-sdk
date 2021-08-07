@@ -71,15 +71,16 @@ impl GetAccessToken for WeChatClient {
         let token = self.token.read().await;
 
         if !token.is_expired() {
-            Ok(WxAccessToken {
+            return Ok(WxAccessToken {
                 access_token: String::from(&*token.access_token),
                 expire_ts: token.expire_ts,
-            })
-        } else {
-            self.refresh_access_token().await?;
-            let token = self.token.read().await;
-            Ok(token.clone())
+            });
         }
+        drop(token);
+
+        self.refresh_access_token().await?;
+        let token = self.token.read().await;
+        Ok(token.clone())
     }
 
     async fn refresh_access_token(&self) -> Result<(), WxClientError> {
