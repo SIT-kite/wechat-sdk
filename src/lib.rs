@@ -1,4 +1,4 @@
-pub use client::WeChatClientBuilder;
+pub use client::{WeChatClient, WeChatClientBuilder};
 pub use error::WxClientError;
 
 pub mod client;

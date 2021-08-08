@@ -1,7 +1,7 @@
 use crate::wechat::WxAccessToken;
 use reqwest::Client;
-use tokio::sync::RwLock;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 #[derive(Clone)]
 pub struct WeChatClient {

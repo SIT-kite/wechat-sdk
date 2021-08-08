@@ -3,16 +3,18 @@ use serde::Serialize;
 use serde_json::Error as JsonError;
 
 #[derive(Debug, Serialize, thiserror::Error)]
-#[error("Wechat interface error {}: {:?}.", code, msg)]
+#[error("Wechat API {}: {:?}.", code, msg)]
 pub struct WxApiError {
     pub code: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub msg: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum WxClientError {
+    #[error("Wechat server returned an error: {0}")]
     Api(WxApiError),
+    #[error("Error while requesting: {0}")]
     Inner(Box<dyn std::error::Error>),
 }
 
